@@ -65,7 +65,7 @@ class Crop extends StatelessWidget {
   final Color? maskColor;
 
   /// [Color] of the base color of the cropping editor.
-  final Color baseColor;
+  final Color? baseColor;
 
   /// Corner radius of cropping area
   final double radius;
@@ -105,7 +105,7 @@ class Crop extends StatelessWidget {
     this.onMoved,
     this.onStatusChanged,
     this.maskColor,
-    this.baseColor = Colors.white,
+    this.baseColor,
     this.radius = 0,
     this.cornerDotBuilder,
     this.fixArea = false,
@@ -163,7 +163,7 @@ class _CropEditor extends StatefulWidget {
   final ValueChanged<Rect>? onMoved;
   final ValueChanged<CropStatus>? onStatusChanged;
   final Color? maskColor;
-  final Color baseColor;
+  final Color? baseColor;
   final double radius;
   final CornerDotBuilder? cornerDotBuilder;
   final bool fixArea;
@@ -184,7 +184,7 @@ class _CropEditor extends StatefulWidget {
     this.onMoved,
     this.onStatusChanged,
     this.maskColor,
-    required this.baseColor,
+    this.baseColor,
     required this.radius,
     this.cornerDotBuilder,
     required this.fixArea,
@@ -464,7 +464,7 @@ class _CropEditorState extends State<_CropEditor> {
                   onScaleStart: widget.interactive ? _startScale : null,
                   onScaleUpdate: widget.interactive ? _updateScale : null,
                   child: Container(
-                    color: widget.baseColor,
+                    color: widget.baseColor ?? Colors.transparent,
                     width: _imageRect.width,
                     height: _imageRect.height,
                     alignment: Alignment.center,
@@ -497,7 +497,7 @@ class _CropEditorState extends State<_CropEditor> {
                   child: Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: widget.maskColor ?? Colors.black.withAlpha(100),
+                    color: widget.maskColor ?? Colors.transparent,
                   ),
                 ),
               ),
