@@ -89,6 +89,9 @@ class Crop extends StatelessWidget {
   /// [false] by default.
   final bool interactive;
 
+  /// Border of cropped area
+  final BoxBorder? border;
+
   const Crop({
     Key? key,
     required this.image,
@@ -108,6 +111,7 @@ class Crop extends StatelessWidget {
     this.fixArea = false,
     this.progressIndicator = const SizedBox.shrink(),
     this.interactive = false,
+    this.border,
   })  : assert((initialSize ?? 1.0) <= 1.0,
             'initialSize must be less than 1.0, or null meaning not specified.'),
         super(key: key);
@@ -139,6 +143,7 @@ class Crop extends StatelessWidget {
             fixArea: fixArea,
             progressIndicator: progressIndicator,
             interactive: interactive,
+            border: border,
           ),
         );
       },
@@ -164,6 +169,7 @@ class _CropEditor extends StatefulWidget {
   final bool fixArea;
   final Widget progressIndicator;
   final bool interactive;
+  final BoxBorder? border;
 
   const _CropEditor({
     Key? key,
@@ -184,6 +190,7 @@ class _CropEditor extends StatefulWidget {
     required this.fixArea,
     required this.progressIndicator,
     required this.interactive,
+    this.border,
   }) : super(key: key);
 
   @override
@@ -458,8 +465,9 @@ class _CropEditorState extends State<_CropEditor> {
                   onScaleUpdate: widget.interactive ? _updateScale : null,
                   child: Container(
                     color: widget.baseColor,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    width: _imageRect.width,
+                    height: _imageRect.height,
+                    alignment: Alignment.center,
                     child: Stack(
                       children: [
                         Positioned(
@@ -509,13 +517,15 @@ class _CropEditorState extends State<_CropEditor> {
                     child: Container(
                       width: _rect.width,
                       height: _rect.height,
-                      color: Colors.transparent,
+                      decoration: BoxDecoration(
+                        border: widget.border,
+                      ),
                     ),
                   ),
                 ),
               Positioned(
                 left: _rect.left - (dotTotalSize / 2),
-                top: _rect.top - (dotTotalSize / 2),
+                top: _rect.top - (dotTotalSize / 2), 
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
