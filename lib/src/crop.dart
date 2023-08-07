@@ -1,7 +1,5 @@
 part of crop_your_image;
 
-const dotTotalSize = 32.0; // fixed corner dot size.
-
 typedef CornerDotBuilder = Widget Function(
     double size, EdgeAlignment edgeAlignment);
 
@@ -92,6 +90,9 @@ class Crop extends StatelessWidget {
   /// Border of cropped area
   final BoxBorder? border;
 
+  /// Size of dots
+  final double dotsSize;
+
   const Crop({
     Key? key,
     required this.image,
@@ -112,6 +113,7 @@ class Crop extends StatelessWidget {
     this.progressIndicator = const SizedBox.shrink(),
     this.interactive = false,
     this.border,
+    required this.dotsSize,
   })  : assert((initialSize ?? 1.0) <= 1.0,
             'initialSize must be less than 1.0, or null meaning not specified.'),
         super(key: key);
@@ -144,6 +146,7 @@ class Crop extends StatelessWidget {
             progressIndicator: progressIndicator,
             interactive: interactive,
             border: border,
+            dotsSize: dotsSize,
           ),
         );
       },
@@ -170,6 +173,7 @@ class _CropEditor extends StatefulWidget {
   final Widget progressIndicator;
   final bool interactive;
   final BoxBorder? border;
+  final double dotsSize;
 
   const _CropEditor({
     Key? key,
@@ -191,6 +195,7 @@ class _CropEditor extends StatefulWidget {
     required this.progressIndicator,
     required this.interactive,
     this.border,
+    required this.dotsSize,
   }) : super(key: key);
 
   @override
@@ -382,10 +387,10 @@ class _CropEditorState extends State<_CropEditor> {
 
     if (widget.initialAreaBuilder != null) {
       rect = widget.initialAreaBuilder!(Rect.fromLTWH(
-        0,
-        0,
-        screenSize.width,
-        screenSize.height,
+        _imageRect.left,
+        _imageRect.top,
+        _imageRect.width,
+        _imageRect.height,
       ));
     } else {
       _resizeWith(widget.aspectRatio, widget.initialArea);
@@ -456,6 +461,7 @@ class _CropEditorState extends State<_CropEditor> {
     return _isImageLoading
         ? Center(child: widget.progressIndicator)
         : Stack(
+            alignment: Alignment.center,
             children: [
               Listener(
                 onPointerDown: (_) => _pointerNum++,
@@ -465,10 +471,11 @@ class _CropEditorState extends State<_CropEditor> {
                   onScaleUpdate: widget.interactive ? _updateScale : null,
                   child: Container(
                     color: widget.baseColor ?? Colors.transparent,
-                    width: _imageRect.width,
-                    height: _imageRect.height,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     alignment: Alignment.center,
                     child: Stack(
+                      alignment: Alignment.center,
                       children: [
                         Positioned(
                           left: _imageRect.left,
@@ -524,8 +531,8 @@ class _CropEditorState extends State<_CropEditor> {
                   ),
                 ),
               Positioned(
-                left: _rect.left - (dotTotalSize / 2),
-                top: _rect.top - (dotTotalSize / 2), 
+                left: _rect.left - widget.dotsSize,
+                top: _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -539,13 +546,13 @@ class _CropEditorState extends State<_CropEditor> {
                           );
                         },
                   child: widget.cornerDotBuilder
-                          ?.call(dotTotalSize, EdgeAlignment.topLeft) ??
+                          ?.call(widget.dotsSize, EdgeAlignment.topLeft) ??
                       const DotControl(),
                 ),
               ),
               Positioned(
-                left: _rect.right - (dotTotalSize / 2),
-                top: _rect.top - (dotTotalSize / 2),
+                left: _rect.right - widget.dotsSize,
+                top: _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -559,13 +566,13 @@ class _CropEditorState extends State<_CropEditor> {
                           );
                         },
                   child: widget.cornerDotBuilder
-                          ?.call(dotTotalSize, EdgeAlignment.topRight) ??
+                          ?.call(widget.dotsSize, EdgeAlignment.topRight) ??
                       const DotControl(),
                 ),
               ),
               Positioned(
-                left: _rect.left - (dotTotalSize / 2),
-                top: _rect.bottom - (dotTotalSize / 2),
+                left: _rect.left - widget.dotsSize,
+                top: _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -579,13 +586,13 @@ class _CropEditorState extends State<_CropEditor> {
                           );
                         },
                   child: widget.cornerDotBuilder
-                          ?.call(dotTotalSize, EdgeAlignment.bottomLeft) ??
+                          ?.call(widget.dotsSize, EdgeAlignment.bottomLeft) ??
                       const DotControl(),
                 ),
               ),
               Positioned(
-                left: _rect.right - (dotTotalSize / 2),
-                top: _rect.bottom - (dotTotalSize / 2),
+                left: _rect.right - widget.dotsSize,
+                top: _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -599,7 +606,7 @@ class _CropEditorState extends State<_CropEditor> {
                           );
                         },
                   child: widget.cornerDotBuilder
-                          ?.call(dotTotalSize, EdgeAlignment.bottomRight) ??
+                          ?.call(widget.dotsSize, EdgeAlignment.bottomRight) ??
                       const DotControl(),
                 ),
               ),
@@ -666,6 +673,7 @@ class DotControl extends StatelessWidget {
     Key? key,
     this.color = Colors.white,
     this.padding = 8,
+    this.dotsSize = 32,
   }) : super(key: key);
 
   /// [Color] of this widget. [Colors.white] by default.
@@ -676,18 +684,20 @@ class DotControl extends StatelessWidget {
   /// but visible size can be changed by setting this value.
   final double padding;
 
+  final double dotsSize;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.transparent,
-      width: dotTotalSize,
-      height: dotTotalSize,
+      width: dotsSize,
+      height: dotsSize,
       child: Center(
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(dotTotalSize),
+          borderRadius: BorderRadius.circular(dotsSize),
           child: Container(
-            width: dotTotalSize - (padding * 2),
-            height: dotTotalSize - (padding * 2),
+            width: dotsSize - (padding * 2),
+            height: dotsSize - (padding * 2),
             color: color,
           ),
         ),
