@@ -93,6 +93,12 @@ class Crop extends StatelessWidget {
   /// Size of dots
   final double dotsSize;
 
+  /// [Color] of the cropped area
+  final Color? croppedAreaColor;
+
+  /// If [true], size of cropping area includes the size of corner dots.
+  final bool removeDotsPadding;
+
   const Crop({
     Key? key,
     required this.image,
@@ -114,6 +120,8 @@ class Crop extends StatelessWidget {
     this.interactive = false,
     this.border,
     required this.dotsSize,
+    this.croppedAreaColor,
+    this.removeDotsPadding = false,
   })  : assert((initialSize ?? 1.0) <= 1.0,
             'initialSize must be less than 1.0, or null meaning not specified.'),
         super(key: key);
@@ -147,6 +155,8 @@ class Crop extends StatelessWidget {
             interactive: interactive,
             border: border,
             dotsSize: dotsSize,
+            croppedAreaColor: croppedAreaColor,
+            removeDotsPadding: removeDotsPadding,
           ),
         );
       },
@@ -174,6 +184,8 @@ class _CropEditor extends StatefulWidget {
   final bool interactive;
   final BoxBorder? border;
   final double dotsSize;
+  final Color? croppedAreaColor;
+  final bool removeDotsPadding;
 
   const _CropEditor({
     Key? key,
@@ -196,6 +208,8 @@ class _CropEditor extends StatefulWidget {
     required this.interactive,
     this.border,
     required this.dotsSize,
+    this.croppedAreaColor,
+    required this.removeDotsPadding,
   }) : super(key: key);
 
   @override
@@ -526,13 +540,21 @@ class _CropEditorState extends State<_CropEditor> {
                       height: _rect.height,
                       decoration: BoxDecoration(
                         border: widget.border,
+                        color: widget.croppedAreaColor,
+                        borderRadius: widget.removeDotsPadding
+                            ? BorderRadius.circular(widget.radius)
+                            : null,
                       ),
                     ),
                   ),
                 ),
               Positioned(
-                left: _rect.left - widget.dotsSize,
-                top: _rect.top - widget.dotsSize,
+                left: widget.removeDotsPadding
+                    ? _rect.left
+                    : _rect.left - widget.dotsSize,
+                top: widget.removeDotsPadding
+                    ? _rect.top
+                    : _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -551,8 +573,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.right - widget.dotsSize,
-                top: _rect.top - widget.dotsSize,
+                left: widget.removeDotsPadding
+                    ? _rect.right - widget.dotsSize * 2
+                    : _rect.right - widget.dotsSize,
+                top: widget.removeDotsPadding
+                    ? _rect.top
+                    : _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -571,8 +597,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.left - widget.dotsSize,
-                top: _rect.bottom - widget.dotsSize,
+                left: widget.removeDotsPadding
+                    ? _rect.left
+                    : _rect.left - widget.dotsSize,
+                top: widget.removeDotsPadding
+                    ? _rect.bottom - widget.dotsSize * 2
+                    : _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -591,8 +621,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.right - widget.dotsSize,
-                top: _rect.bottom - widget.dotsSize,
+                left: widget.removeDotsPadding
+                    ? _rect.right - widget.dotsSize * 2
+                    : _rect.right - widget.dotsSize,
+                top: widget.removeDotsPadding
+                    ? _rect.bottom - widget.dotsSize * 2
+                    : _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
