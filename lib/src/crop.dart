@@ -96,6 +96,9 @@ class Crop extends StatelessWidget {
   /// [Color] of the cropped area
   final Color? croppedAreaColor;
 
+  /// If [true], size of cropping area includes the size of corner dots.
+  final bool includeCornerDotsSize;
+
   const Crop({
     Key? key,
     required this.image,
@@ -118,6 +121,7 @@ class Crop extends StatelessWidget {
     this.border,
     required this.dotsSize,
     this.croppedAreaColor,
+    this.includeCornerDotsSize = false,
   })  : assert((initialSize ?? 1.0) <= 1.0,
             'initialSize must be less than 1.0, or null meaning not specified.'),
         super(key: key);
@@ -152,6 +156,7 @@ class Crop extends StatelessWidget {
             border: border,
             dotsSize: dotsSize,
             croppedAreaColor: croppedAreaColor,
+            includeCornerDotsSize: includeCornerDotsSize,
           ),
         );
       },
@@ -180,6 +185,7 @@ class _CropEditor extends StatefulWidget {
   final BoxBorder? border;
   final double dotsSize;
   final Color? croppedAreaColor;
+  final bool includeCornerDotsSize;
 
   const _CropEditor({
     Key? key,
@@ -203,6 +209,7 @@ class _CropEditor extends StatefulWidget {
     this.border,
     required this.dotsSize,
     this.croppedAreaColor,
+    required this.includeCornerDotsSize,
   }) : super(key: key);
 
   @override
@@ -539,8 +546,12 @@ class _CropEditorState extends State<_CropEditor> {
                   ),
                 ),
               Positioned(
-                left: _rect.left - widget.dotsSize,
-                top: _rect.top - widget.dotsSize,
+                left: widget.includeCornerDotsSize
+                    ? _rect.left
+                    : _rect.left - widget.dotsSize,
+                top: widget.includeCornerDotsSize
+                    ? _rect.top
+                    : _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -559,8 +570,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.right - widget.dotsSize,
-                top: _rect.top - widget.dotsSize,
+                left: widget.includeCornerDotsSize
+                    ? _rect.right - widget.dotsSize * 2
+                    : _rect.right - widget.dotsSize,
+                top: widget.includeCornerDotsSize
+                    ? _rect.top
+                    : _rect.top - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -579,8 +594,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.left - widget.dotsSize,
-                top: _rect.bottom - widget.dotsSize,
+                left: widget.includeCornerDotsSize
+                    ? _rect.left
+                    : _rect.left - widget.dotsSize,
+                top: widget.includeCornerDotsSize
+                    ? _rect.bottom - widget.dotsSize * 2
+                    : _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
@@ -599,8 +618,12 @@ class _CropEditorState extends State<_CropEditor> {
                 ),
               ),
               Positioned(
-                left: _rect.right - widget.dotsSize,
-                top: _rect.bottom - widget.dotsSize,
+                left: widget.includeCornerDotsSize
+                    ? _rect.right - widget.dotsSize * 2
+                    : _rect.right - widget.dotsSize,
+                top: widget.includeCornerDotsSize
+                    ? _rect.bottom - widget.dotsSize * 2
+                    : _rect.bottom - widget.dotsSize,
                 child: GestureDetector(
                   onPanUpdate: widget.fixArea
                       ? null
