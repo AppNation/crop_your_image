@@ -93,6 +93,9 @@ class Crop extends StatelessWidget {
   /// Size of dots
   final double dotsSize;
 
+  /// [Color] of the cropped area
+  final Color? croppedAreaColor;
+
   const Crop({
     Key? key,
     required this.image,
@@ -114,6 +117,7 @@ class Crop extends StatelessWidget {
     this.interactive = false,
     this.border,
     required this.dotsSize,
+    this.croppedAreaColor,
   })  : assert((initialSize ?? 1.0) <= 1.0,
             'initialSize must be less than 1.0, or null meaning not specified.'),
         super(key: key);
@@ -147,6 +151,7 @@ class Crop extends StatelessWidget {
             interactive: interactive,
             border: border,
             dotsSize: dotsSize,
+            croppedAreaColor: croppedAreaColor,
           ),
         );
       },
@@ -174,6 +179,7 @@ class _CropEditor extends StatefulWidget {
   final bool interactive;
   final BoxBorder? border;
   final double dotsSize;
+  final Color? croppedAreaColor;
 
   const _CropEditor({
     Key? key,
@@ -196,6 +202,7 @@ class _CropEditor extends StatefulWidget {
     required this.interactive,
     this.border,
     required this.dotsSize,
+    this.croppedAreaColor,
   }) : super(key: key);
 
   @override
@@ -526,6 +533,7 @@ class _CropEditorState extends State<_CropEditor> {
                       height: _rect.height,
                       decoration: BoxDecoration(
                         border: widget.border,
+                        color: widget.croppedAreaColor,
                       ),
                     ),
                   ),
