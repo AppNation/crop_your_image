@@ -541,6 +541,9 @@ class _CropEditorState extends State<_CropEditor> {
                       decoration: BoxDecoration(
                         border: widget.border,
                         color: widget.croppedAreaColor,
+                        borderRadius: widget.includeCornerDotsSize
+                            ? BorderRadius.circular(widget.radius)
+                            : null,
                       ),
                     ),
                   ),
